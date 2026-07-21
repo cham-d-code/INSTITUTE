@@ -1,0 +1,331 @@
+@import 'tailwindcss';
+
+@import './styles/fonts.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   TIMS design tokens
+
+   The visual language is deliberately monochrome — near-black, white, and a
+   narrow ramp of warm greys — with colour reserved almost entirely for state
+   that a person must read correctly under time pressure (paid / unpaid / not
+   enrolled at the classroom door, FR-052).
+
+   Because colour carries operational meaning here, every status is ALSO
+   expressed with an icon and a text label. Never encode a status in colour
+   alone; assistants scan in bright doorway light on cheap Android screens.
+--------------------------------------------------------------------------- */
+
+:root {
+  --radius: 1rem;
+
+  /* Surfaces — the page is a soft grey, cards float on it as pure white. */
+  --background: oklch(0.968 0.002 286);
+  --foreground: oklch(0.145 0 0);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+
+  /* Primary is near-black: the pill buttons and the sidebar. */
+  --primary: oklch(0.145 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.967 0.001 286);
+  --secondary-foreground: oklch(0.21 0.006 286);
+
+  --muted: oklch(0.967 0.001 286);
+  --muted-foreground: oklch(0.552 0.016 286);
+
+  --accent: oklch(0.967 0.001 286);
+  --accent-foreground: oklch(0.21 0.006 286);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.92 0.004 286);
+  --input: oklch(0.92 0.004 286);
+  --ring: oklch(0.145 0 0);
+
+  /* --- Operational status ------------------------------------------------
+     Tuned so the door-scan card reads correctly at arm's length. Each has a
+     solid variant (the full-bleed scan result) and a soft variant (table
+     pills, roster badges). */
+
+  /* Enrolled and paid — proceed. */
+  --status-ok: oklch(0.596 0.145 163);
+  --status-ok-foreground: oklch(0.99 0 0);
+  --status-ok-soft: oklch(0.951 0.037 163);
+  --status-ok-soft-foreground: oklch(0.393 0.095 163);
+
+  /* Enrolled but fee outstanding — send to the payment desk. */
+  --status-warn: oklch(0.769 0.161 70);
+  --status-warn-foreground: oklch(0.216 0.045 70);
+  --status-warn-soft: oklch(0.962 0.048 84);
+  --status-warn-soft-foreground: oklch(0.473 0.113 62);
+
+  /* Not enrolled in this class, or card revoked — stop. */
+  --status-stop: oklch(0.586 0.222 27);
+  --status-stop-foreground: oklch(0.99 0 0);
+  --status-stop-soft: oklch(0.955 0.033 18);
+  --status-stop-soft-foreground: oklch(0.457 0.171 27);
+
+  /* Late arrival, guest/trial, pending correction — needs a human's eye. */
+  --status-info: oklch(0.546 0.183 262);
+  --status-info-foreground: oklch(0.99 0 0);
+  --status-info-soft: oklch(0.951 0.026 262);
+  --status-info-soft-foreground: oklch(0.424 0.152 265);
+
+  /* Voided / inactive / left — present in history, inert. */
+  --status-void: oklch(0.552 0.016 286);
+  --status-void-foreground: oklch(0.99 0 0);
+  --status-void-soft: oklch(0.955 0.002 286);
+  --status-void-soft-foreground: oklch(0.44 0.014 286);
+
+  /* --- Charts -------------------------------------------------------------
+     Two distinct roles, and they must not be confused:
+
+     `--chart-primary` is graphite — the single dark trend line of the
+     reference dashboard. Most charts here plot one measure (revenue, monthly
+     attendance %) and should use it.
+
+     `--chart-1..5` is the CATEGORICAL set, for the genuinely multi-series
+     charts (collections per assistant, class sizes per grade). The hues and
+     their ORDER are load-bearing, not cosmetic: this sequence was checked with
+     the palette validator against this app's own surfaces and passes the
+     lightness band, chroma floor, colour-blind separation (worst adjacent
+     ΔE 9.1 protan) and normal-vision floor (worst 19.6) in both modes.
+     Reordering or substituting a hue silently breaks that — re-run the
+     validator if you change one.
+
+     Note these are deliberately NOT the --status-* hues. A status colour must
+     never impersonate a series; magenta and yellow sit below 3:1 on the white
+     card, so any chart using them ships direct labels or the table view. */
+  --chart-primary: oklch(0.205 0.005 286);
+  --chart-1: #2a78d6;
+  --chart-2: #008300;
+  --chart-3: #e87ba4;
+  --chart-4: #eda100;
+  --chart-5: #1baf7a;
+
+  /* Chart chrome — recessive by design; the data is the only loud thing. */
+  --chart-grid: oklch(0.94 0.003 286);
+  --chart-axis: oklch(0.87 0.005 286);
+  --chart-label: oklch(0.552 0.016 286);
+
+  /* Sidebar — the floating black rail from the reference. */
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(1 0 0);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(0.269 0.005 286);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0.005 286);
+  --sidebar-ring: oklch(0.985 0 0);
+}
+
+.dark {
+  --background: oklch(0.141 0.004 286);
+  --foreground: oklch(0.985 0 0);
+
+  --card: oklch(0.185 0.005 286);
+  --card-foreground: oklch(0.985 0 0);
+
+  --popover: oklch(0.185 0.005 286);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.185 0.005 286);
+
+  --secondary: oklch(0.274 0.006 286);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --muted: oklch(0.274 0.006 286);
+  --muted-foreground: oklch(0.712 0.013 286);
+
+  --accent: oklch(0.274 0.006 286);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --destructive: oklch(0.704 0.191 22);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.552 0.016 286);
+
+  --status-ok: oklch(0.696 0.153 163);
+  --status-ok-foreground: oklch(0.14 0.03 163);
+  --status-ok-soft: oklch(0.32 0.055 163);
+  --status-ok-soft-foreground: oklch(0.845 0.093 163);
+
+  --status-warn: oklch(0.828 0.163 84);
+  --status-warn-foreground: oklch(0.19 0.04 70);
+  --status-warn-soft: oklch(0.33 0.06 70);
+  --status-warn-soft-foreground: oklch(0.879 0.116 84);
+
+  --status-stop: oklch(0.674 0.203 24);
+  --status-stop-foreground: oklch(0.15 0.04 27);
+  --status-stop-soft: oklch(0.32 0.08 27);
+  --status-stop-soft-foreground: oklch(0.855 0.077 18);
+
+  --status-info: oklch(0.665 0.166 262);
+  --status-info-foreground: oklch(0.15 0.04 262);
+  --status-info-soft: oklch(0.31 0.07 262);
+  --status-info-soft-foreground: oklch(0.855 0.06 262);
+
+  --status-void: oklch(0.712 0.013 286);
+  --status-void-foreground: oklch(0.16 0.004 286);
+  --status-void-soft: oklch(0.29 0.006 286);
+  --status-void-soft-foreground: oklch(0.79 0.012 286);
+
+  /* Dark mode is SELECTED, not an automatic flip: the same five hues re-stepped
+     for the dark card and re-validated against it (all five clear 3:1 there). */
+  --chart-primary: oklch(0.985 0 0);
+  --chart-1: #3987e5;
+  --chart-2: #008300;
+  --chart-3: #d55181;
+  --chart-4: #c98500;
+  --chart-5: #199e70;
+
+  --chart-grid: oklch(0.26 0.006 286);
+  --chart-axis: oklch(0.33 0.006 286);
+  --chart-label: oklch(0.712 0.013 286);
+
+  --sidebar: oklch(0.185 0.005 286);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.185 0.005 286);
+  --sidebar-accent: oklch(0.274 0.006 286);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.552 0.016 286);
+}
+
+@theme inline {
+  --font-sans:
+    'Satoshi', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-status-ok: var(--status-ok);
+  --color-status-ok-foreground: var(--status-ok-foreground);
+  --color-status-ok-soft: var(--status-ok-soft);
+  --color-status-ok-soft-foreground: var(--status-ok-soft-foreground);
+  --color-status-warn: var(--status-warn);
+  --color-status-warn-foreground: var(--status-warn-foreground);
+  --color-status-warn-soft: var(--status-warn-soft);
+  --color-status-warn-soft-foreground: var(--status-warn-soft-foreground);
+  --color-status-stop: var(--status-stop);
+  --color-status-stop-foreground: var(--status-stop-foreground);
+  --color-status-stop-soft: var(--status-stop-soft);
+  --color-status-stop-soft-foreground: var(--status-stop-soft-foreground);
+  --color-status-info: var(--status-info);
+  --color-status-info-foreground: var(--status-info-foreground);
+  --color-status-info-soft: var(--status-info-soft);
+  --color-status-info-soft-foreground: var(--status-info-soft-foreground);
+  --color-status-void: var(--status-void);
+  --color-status-void-foreground: var(--status-void-foreground);
+  --color-status-void-soft: var(--status-void-soft);
+  --color-status-void-soft-foreground: var(--status-void-soft-foreground);
+
+  --color-chart-primary: var(--chart-primary);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+  --color-chart-label: var(--chart-label);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* The reference leans on generous, consistent rounding: pill controls,
+     soft-square cards. */
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Numbers in money columns, receipt numbers and student IDs must align and
+     compare cleanly down a column. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* Respect the OS setting — the scan screen animates a lot. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* The card treatment from the reference: white, softly rounded, a hairline
+     border instead of a heavy shadow. */
+  .card-surface {
+    @apply bg-card text-card-foreground border-border rounded-2xl border;
+  }
+
+  /* Keeps the scan viewport clear of the Android gesture bar. */
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}

@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Builds
+dist/
+build/
+*.tsbuildinfo
+
+# Environment — these hold real secrets. Only .env.example is committed.
+.env
+.env.local
+.env.*.local
+
+# Runtime data. Student photos and database dumps contain personal data of
+# minors (NFR-05); they must never reach the repository.
+uploads/
+backups/
+*.dump
+*.sql.gz
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test & tooling output
+coverage/
+.eslintcache
+.vite/
+
+# Generated PWA artefacts
+frontend/dev-dist/

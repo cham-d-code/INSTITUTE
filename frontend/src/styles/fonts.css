@@ -1,0 +1,44 @@
+/* ---------------------------------------------------------------------------
+   Satoshi — Indian Type Foundry, distributed via Fontshare.
+   Free for personal and commercial use under the Fontshare licence.
+
+   Self-hosted rather than CDN-linked on purpose: the assistant app has to
+   render correctly at the classroom door with no connectivity (MA-004), and a
+   remote stylesheet would leave the UI in fallback metrics exactly when it is
+   least usable. ~100 KB total, precached by the service worker.
+
+   Weights map to the reference design: 400 body, 500 UI labels and buttons,
+   700 headings and figures, 900 the large dashboard numerals.
+--------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('../assets/fonts/Satoshi-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('../assets/fonts/Satoshi-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('../assets/fonts/Satoshi-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('../assets/fonts/Satoshi-900.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
