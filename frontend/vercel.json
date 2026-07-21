@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "comment": "SPA fallback. React Router owns the URL, so any path that isn't a real file must return index.html — otherwise refreshing on /students, or opening a shared link to a session, 404s. The (?!api/) exclusion lets API paths 404 honestly instead of returning HTML that the client then tries to parse as JSON.",
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "comment": "Never cache the service worker or the manifest. If an old sw.js is cached, assistants keep running a stale app and stop receiving updates — which matters when the update fixes the scanner.",
+      "source": "/(sw.js|registerSW.js|manifest.webmanifest)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "comment": "Fingerprinted build assets are immutable — the filename changes when the content does.",
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        {
+          "comment": "The scanner needs the camera; nothing else does, and no third party ever should.",
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ]
+}
