@@ -16,10 +16,47 @@ DEV TUTION/
 | Area | Status |
 |---|---|
 | Frontend foundation | Built — design system, routing, RBAC, layout, dashboard |
-| Frontend feature screens | Scaffolded, tagged with the requirements each one owns |
+| Frontend feature screens | **Built** — every screen is implemented and interactive |
+| Mock API layer | In-memory, seeded, behind a single swap point (`lib/api/endpoints.ts`) |
 | Backend | Folder structure and conventions only |
 
-`npm run build` and `npm run lint` both pass in `frontend/`.
+`npm run build` and `npm run lint` both pass in `frontend/`. Every screen works
+against a seeded in-memory dataset, so the whole app is clickable end to end —
+register a student, scan a card, take a payment, void it, watch the audit log
+and arrears update. When the Express API is ready, only `lib/api/endpoints.ts`
+is repointed; the screens don't change.
+
+### What's wired
+
+- **Students** — list with search/filters, profile (guardians, enrolments,
+  attendance, fee history), register/edit with duplicate warning and one-step
+  class enrolment.
+- **Teachers** — list, profile with weekly timetable, overlap detection, and
+  payment arrangement.
+- **Classes** — list, roster with live per-student payment status, session
+  history.
+- **Scanner** (PWA, full-screen) — auto-suggested session, live camera QR read,
+  full-bleed paid/unpaid/not-enrolled result with distinct sounds and haptics,
+  duplicate and revoked-card handling, offline queue in IndexedDB with
+  auto-sync, and a demo "simulate scan" panel for camera-less review.
+- **Attendance** — today's sessions, class attendance-rate view, session
+  register with manual marking (reason required) and Super-Admin void.
+- **Payments** — record against outstanding dues (partial supported),
+  printable receipt, reprint logging, list, Super-Admin void that re-opens the
+  dues; daily collection reconciliation split cash vs transfer, per assistant.
+- **Fees** — arrears with filters and CSV/PDF export; fee policy; discount
+  approvals.
+- **ID cards** — generate, batch-select, print CR80 cards on an A4 sheet;
+  reissue (revokes the old token) from the profile.
+- **Corrections, Reports, Audit, Users, Settings** — all implemented, gated by
+  role.
+
+### Reviewing the RBAC
+
+The top-right identity chip has a **"View as (demo)"** switcher. Switch to
+*Ashen Fernando (Assistant)* to see the assistant-limited experience — no audit
+log, no financial reports, no voids, lands on the scanner. This switcher exists
+only in the mock build.
 
 ## Running the frontend
 

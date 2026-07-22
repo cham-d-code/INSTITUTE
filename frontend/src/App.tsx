@@ -4,45 +4,47 @@ import { AppProviders } from '@/app/providers'
 import { router } from '@/app/router'
 import { useAuthStore } from '@/lib/auth/auth-store'
 import { setUnauthenticatedHandler } from '@/lib/api/client'
+import { authApi } from '@/lib/api/endpoints'
 
 export default function App() {
   const setUser = useAuthStore((s) => s.setUser)
   const setInitialising = useAuthStore((s) => s.setInitialising)
 
   useEffect(() => {
-    // When the API reports the session is gone — idle timeout (FR-003) or the
-    // account was deactivated (FR-005) — drop the user and let the route
-    // guards bounce to /login.
+    // When the session dies — idle timeout (FR-003) or the account was
+    // deactivated (FR-005) — drop the user and let the guards bounce to /login.
     setUnauthenticatedHandler(() => {
       setUser(null)
       setInitialising(false)
     })
 
-    // ---------------------------------------------------------------------
-    // SCAFFOLD ONLY. Replace with a probe of GET /api/auth/me, which restores
-    // the session from the refresh cookie on reload.
+    // Restore the session on load. This goes through the same API seam as
+    // everything else (`authApi.me`), so when the real backend arrives it
+    // becomes a genuine `GET /api/auth/me` against the refresh cookie with no
+    // change here.
     //
-    // This stub signs everyone in as a Super Admin so the shell is reviewable
-    // before the backend exists. It MUST be deleted before any deployment —
-    // it is an authentication bypass, not a convenience.
-    // ---------------------------------------------------------------------
-    setUser({
-      id: 'dev-user',
-      fullName: 'Institute Owner',
-      username: 'owner',
-      email: null,
-      phone: null,
-      photoUrl: null,
-      role: 'super_admin',
-      isActive: true,
-      mustChangePassword: false,
-      twoFactorEnabled: false,
-      lastLoginAt: null,
-      createdAt: new Date().toISOString(),
-    })
-    setInitialising(false)
+    // NOTE: the mock currently starts with a signed-in demo owner so the app
+    // is reviewable without a login round-trip. That convenience lives in the
+    // mock (`sessionUserId` in lib/mock/api.ts) and disappears the moment the
+    // mock is swapped out — this component already handles a null user by
+    // routing to /login.
+    let cancelled = false
+    authApi
+      .me()
+      .then((user) => {
+        if (!cancelled) setUser(user)
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null)
+      })
+      .finally(() => {
+        if (!cancelled) setInitialising(false)
+      })
 
-    return () => setUnauthenticatedHandler(null)
+    return () => {
+      cancelled = true
+      setUnauthenticatedHandler(null)
+    }
   }, [setUser, setInitialising])
 
   return (

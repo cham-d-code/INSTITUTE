@@ -329,3 +329,48 @@
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Print — ID card sheets (FR-042) and payment receipts (FR-074).
+
+   The app chrome (sidebar, header, buttons) must never reach paper. Everything
+   is hidden by default when printing, and only the two print-safe containers —
+   the batch card sheet and the receipt — are made visible.
+--------------------------------------------------------------------------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-sheet,
+  .print-sheet *,
+  .receipt-print,
+  .receipt-print * {
+    visibility: visible;
+  }
+
+  .print-sheet {
+    position: absolute;
+    inset: 0;
+    padding: 8mm;
+  }
+
+  .receipt-print {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80mm;
+    border: none !important;
+  }
+
+  /* Cards keep true colour and their exact CR80 proportion on paper. */
+  .id-card {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 8mm;
+  }
+}

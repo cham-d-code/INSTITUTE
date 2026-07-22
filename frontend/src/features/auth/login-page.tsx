@@ -1,5 +1,9 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
+import { authApi } from '@/lib/api/endpoints'
+import { apiErrorMessage } from '@/lib/api/client'
+import { useAuthStore } from '@/lib/auth/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,25 +12,46 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 /**
  * Sign-in — FR-003.
  *
- * Scaffold: the submit handler is not wired to the API yet.
- *
- * Two rules for whoever wires it up:
- *   - The failure message must stay generic ("Incorrect username or password").
+ * Two rules the server must uphold (the mock already does):
+ *   - The failure message stays generic ("Incorrect username or password").
  *     Never reveal whether the username exists, or whether the account is
  *     deactivated — that turns the login form into a staff directory.
  *   - Rate limiting and lockout belong on the server. There is nothing this
  *     component can do about a scripted attempt that never loads it.
  */
 export function LoginPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const setUser = useAuthStore((s) => s.setUser)
   const [isSubmitting, setSubmitting] = useState(false)
-  const [error] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-  function handleSubmit(event: React.FormEvent) {
+  function fillDemo(name: string) {
+    setUsername(name)
+    setPassword('demo')
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError(null)
     setSubmitting(true)
-    // TODO: POST /api/auth/login, store the access token in memory,
-    // then redirect to the role's landing route.
-    setTimeout(() => setSubmitting(false), 600)
+    try {
+      const user = await authApi.login(username, password)
+      setUser(user)
+      if (user.mustChangePassword) {
+        navigate('/change-password', { replace: true })
+        return
+      }
+      const from = (location.state as { from?: string } | null)?.from
+      const fallback = user.role === 'assistant' ? '/scanner' : '/dashboard'
+      navigate(from ?? fallback, { replace: true })
+    } catch (err) {
+      setError(apiErrorMessage(err, 'Incorrect username or password.'))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -85,10 +110,12 @@ export function LoginPage() {
               <Input
                 id="username"
                 name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 required
                 className="h-11 rounded-xl"
-                placeholder="e.g. nimal.p"
+                placeholder="e.g. owner"
               />
             </div>
 
@@ -106,6 +133,8 @@ export function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 required
                 className="h-11 rounded-xl"
@@ -125,7 +154,17 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-muted-foreground mt-6 text-xs leading-relaxed">
+          <div className="bg-secondary/60 mt-6 rounded-xl p-3">
+            <p className="text-xs font-semibold">Demo accounts</p>
+            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+              Sign in as <button type="button" onClick={() => fillDemo('owner')} className="text-foreground font-medium underline">owner</button>{' '}
+              (Super Admin) or{' '}
+              <button type="button" onClick={() => fillDemo('ashen.f')} className="text-foreground font-medium underline">ashen.f</button>{' '}
+              (Assistant). Any password works in this demo.
+            </p>
+          </div>
+
+          <p className="text-muted-foreground mt-4 text-xs leading-relaxed">
             This system holds personal data of minors. Access is logged against your account,
             including the device you signed in from.
           </p>
